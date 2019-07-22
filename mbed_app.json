@@ -1,0 +1,10 @@
+{
+    "macros": ["MBED_APP_PRINT_INFO", "MBED_APP_PRINT_ERR"],
+
+    "target_overrides": {
+        "*": {
+            "platform.stdio-baud-rate": 115200,
+            "platform.stdio-convert-newlines": true
+        }
+    }
+}
