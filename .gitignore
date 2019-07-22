@@ -1,0 +1,8 @@
+BUILD/*
+.build
+.mbed
+projectfiles
+*.py*
+.vscode
+GettingStarted.html
+mbed_config.h
