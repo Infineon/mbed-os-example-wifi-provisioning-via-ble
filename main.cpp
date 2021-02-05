@@ -22,7 +22,7 @@
 *
 * Related Document: README.md
 *
-* Supported Kits (Target Names): 
+* Supported Kits (Target Names):
 *   CY8CKIT-062-WiFi-BT PSoC 6 WiFi-BT Pioneer Kit (CY8CKIT_062_WIFI_BT)
 *   CY8CPROTO-062-4343W PSoC 6 Wi-Fi BT Prototyping Kit (CY8CPROTO_062_4343W)
 *
@@ -145,7 +145,7 @@ private:
     uint8_t _adv_buffer[ble::LEGACY_ADVERTISING_MAX_SIZE];
     ble::AdvertisingDataBuilder _adv_data_builder;
 
-    /* 
+    /*
      * Callback triggered when the ble initialization process has finished
      */
     void on_init_complete(BLE::InitializationCompleteCallbackContext *params)
@@ -156,7 +156,7 @@ private:
         }
 
 	/* Initialize the BLE service  */
-        _ble_service = new BleService(_ble, (char *)&wifi_ssid_name[0], (char *)&wifi_pwd[0], false);
+        _ble_service = new BleService((char *)&wifi_ssid_name[0], (char *)&wifi_pwd[0], false);
         _ble.gattServer().onDataWritten(this, &WiFiProvisioner::on_data_written);
 
         print_mac_address();
@@ -212,7 +212,7 @@ private:
      * Function to validate WiFi credentials and try to
      * connect to the given WiFi AP SSID.
      */
-    void check_and_let_wifi_connect() 
+    void check_and_let_wifi_connect()
     {
         if (wifi->get_connection_status() == NSAPI_STATUS_GLOBAL_UP)
         {
@@ -252,7 +252,7 @@ private:
             {
                 MBED_APP_INFO(("Connecting to AP...\n"));
                 check_and_let_wifi_connect();
-            }	    
+            }
         }
         else if (params->handle == _ble_service->getConnectStatusValueHandle())
         {
@@ -268,7 +268,7 @@ private:
         }
     }
 
-    /* 
+    /*
      * On disconnect complete event handler
      */
     void onDisconnectionComplete(const ble::DisconnectionCompleteEvent &event) {
@@ -281,7 +281,7 @@ private:
 BLE               &app_ble = BLE::Instance();
 WiFiProvisioner   wifi_provision_app(app_ble, ble_event_queue);
 
-/* 
+/*
  * Schedule processing of events from the BLE middleware in the event queue.
  */
 void schedule_ble_events(BLE::OnEventsToProcessCallbackContext *context)
@@ -347,10 +347,18 @@ int wifi_scan(WiFiInterface *wifi)
  */
 void dump_wifi_stats()
 {
+    SocketAddress ipAddress;
+    SocketAddress netMask;
+    SocketAddress gateway;
+
+    wifi->get_ip_address(&ipAddress);
+    wifi->get_netmask(&netMask);
+    wifi->get_gateway(&gateway);
+
     MBED_APP_INFO(("MAC\t: %s\n", wifi->get_mac_address()));
-    MBED_APP_INFO(("IP\t: %s\n", wifi->get_ip_address()));
-    MBED_APP_INFO(("Netmask\t: %s\n", wifi->get_netmask()));
-    MBED_APP_INFO(("Gateway\t: %s\n", wifi->get_gateway()));
+    MBED_APP_INFO(("IP\t: %s\n", ipAddress.get_ip_address()));
+    MBED_APP_INFO(("Netmask\t: %s\n", netMask.get_ip_address()));
+    MBED_APP_INFO(("Gateway\t: %s\n", gateway.get_ip_address()));
     MBED_APP_INFO(("RSSI\t: %d\n\n", wifi->get_rssi()));
 }
 
@@ -373,7 +381,7 @@ void get_ntp_timestamp(void)
         }
 
         MBED_APP_INFO(("Waiting 5 seconds before trying again.\r\n"));
-        wait(5.0);
+        ThisThread::sleep_for(5s);
 
         if (wifi->get_connection_status() == NSAPI_STATUS_CONNECTING)
         {
@@ -448,7 +456,7 @@ int main()
     /* Start beacon with simple GATT server to configure wifi ssid and password */
     wifi_provision_app.start();
 
-    wait(osWaitForever);
+    ThisThread::sleep_for(osWaitForever);
 
     return 0;
 }

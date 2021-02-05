@@ -14,7 +14,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *******************************************************************************/
-
 #ifndef __BLE_SERVICE_H__
 #define __BLE_SERVICE_H__
 
@@ -29,15 +28,14 @@ public:
     const static UUID WIFI_CONNECT_PWD_UUID;
     const static UUID WIFI_CONNECT_STATUS_UUID;
 
-    BleService(BLEDevice &ble, char *ssid, char *pwd, bool connectionStatus) :
-               _ble(ble),
+    BleService(char *ssid, char *pwd, bool connectionStatus) :
                _wifi_ssid(WIFI_SSID_NAME_UUID, ssid),
                _wifi_pwd(WIFI_CONNECT_PWD_UUID, pwd),
                _wifi_state(WIFI_CONNECT_STATUS_UUID, &connectionStatus)
                {
                    GattCharacteristic *charTable[] = {&_wifi_ssid, &_wifi_pwd, &_wifi_state};
                    GattService         wifiProvisioningService(BLE_SERVICE_UUID, charTable, sizeof(charTable) / sizeof(GattCharacteristic *));
-                   ble.gattServer().addService(wifiProvisioningService);
+                   BLE::Instance().gattServer().addService(wifiProvisioningService);
                }
 
     /*
@@ -65,7 +63,6 @@ public:
     }
 
 private:
-    BLEDevice    &_ble;
     ReadWriteArrayGattCharacteristic<char, WIFI_SSID_LEN> _wifi_ssid;
     ReadWriteArrayGattCharacteristic<char, WIFI_PWD_LEN> _wifi_pwd;
     ReadWriteGattCharacteristic<bool> _wifi_state;
